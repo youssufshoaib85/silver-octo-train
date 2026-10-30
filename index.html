@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Magnetometer Tester</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 40px 20px; background: #1a1a1a; color: #ffffff; }
+        .box { font-size: 28px; margin: 20px auto; font-family: monospace; padding: 15px; background: #2a2a2a; border-radius: 8px; width: 80%; max-width: 300px; color: #00ffcc; border: 1px solid #444; }
+        button { padding: 15px 40px; font-size: 18px; cursor: pointer; border-radius: 30px; border: none; background: #00ffcc; color: #1a1a1a; font-weight: bold; box-shadow: 0 4px 10px rgba(0,255,204,0.3); }
+        button:disabled { background: #555; color: #888; box-shadow: none; cursor: default; }
+    </style>
+</head>
+<body>
+
+    <h1>Magnetometer Test</h1>
+    <p>Tap the button, then move a magnet near your phone.</p>
+    
+    <button id="startBtn">Enable Sensor</button>
+
+    <div class="box">X: <span id="x-val">0.00</span></div>
+    <div class="box">Y: <span id="y-val">0.00</span></div>
+    <div class="box">Z: <span id="z-val">0.00</span></div>
+
+    <script>
+        document.getElementById('startBtn').addEventListener('click', async () => {
+            if ('Magnetometer' in window) {
+                try {
+                    // Initialize sensor at 30 updates per second
+                    const magSensor = new Magnetometer({ frequency: 30 });
+                    
+                    magSensor.addEventListener('reading', () => {
+                        document.getElementById('x-val').textContent = magSensor.x.toFixed(2);
+                        document.getElementById('y-val').textContent = magSensor.y.toFixed(2);
+                        document.getElementById('z-val').textContent = magSensor.z.toFixed(2);
+                    });
+
+                    magSensor.addEventListener('error', event => {
+                        alert("Sensor error: " + event.error.name + " - " + event.error.message);
+                    });
+
+                    magSensor.start();
+                    document.getElementById('startBtn').textContent = "Sensor Running";
+                    document.getElementById('startBtn').disabled = true;
+                } catch (err) {
+                    alert("Could not initialize magnetometer: " + err.message);
+                }
+            } else {
+                alert("Magnetometer API is not supported on this browser version.");
+            }
+        });
+    </script>
+</body>
+</html>
